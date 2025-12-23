@@ -10,7 +10,6 @@ const Settings = () => {
   const [sidebarCollapsedByDefault, setSidebarCollapsedByDefault] = useState(false);
   const [compactMode, setCompactMode] = useState(false);
   const [emailNotifications, setEmailNotifications] = useState(true);
-  const [webAccess, setWebAccess] = useState(false);
 
   useEffect(() => {
     // Sync with user's current team
@@ -39,8 +38,7 @@ const Settings = () => {
       team: selectedDept,
       sidebarCollapsedByDefault,
       compactMode,
-      emailNotifications,
-      webAccess
+      emailNotifications
     });
     // TODO: Save all settings to backend
     alert('Settings saved successfully!');
@@ -158,30 +156,6 @@ const Settings = () => {
                     type="checkbox"
                     checked={emailNotifications}
                     onChange={(e) => setEmailNotifications(e.target.checked)}
-                  />
-                  <span className="toggle-slider"></span>
-                </label>
-              </div>
-            </div>
-          </section>
-
-          {/* Chat Defaults Section */}
-          <section className="settings-section">
-            <div className="section-header">
-              <span className="section-icon">💬</span>
-              <h2>Chat Defaults</h2>
-            </div>
-            <div className="settings-options">
-              <div className="settings-option">
-                <div className="option-content">
-                  <h3>Web access enabled by default</h3>
-                  <p>Allow agents to search the web</p>
-                </div>
-                <label className="toggle-switch">
-                  <input
-                    type="checkbox"
-                    checked={webAccess}
-                    onChange={(e) => setWebAccess(e.target.checked)}
                   />
                   <span className="toggle-slider"></span>
                 </label>
