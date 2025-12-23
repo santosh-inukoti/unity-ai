@@ -1,112 +1,90 @@
-# Production Setup Checklist
+# Production Setup Guide
 
-## Required Before Deployment
+## 1. Secrets & Environment
 
-### 1. Environment Variables
-
-#### Backend Production .env
+### Generate Secrets
 ```bash
+node -e "console.log('JWT_SECRET:', require('crypto').randomBytes(64).toString('hex'))"
+node -e "console.log('SESSION_SECRET:', require('crypto').randomBytes(64).toString('hex'))"
+```
+
+### Backend Configuration (`backend/.env.production`)
+```env
 PORT=3001
 NODE_ENV=production
+LOG_LEVEL=info
 
-# JWT Secret - MUST BE STRONG & UNIQUE
-JWT_SECRET=<GENERATE_STRONG_256_BIT_KEY>
+JWT_SECRET=<GENERATE_ABOVE>
+SESSION_SECRET=<GENERATE_ABOVE>
 
-# Enverus SSO Configuration
-SSO_ENTRY_POINT=https://sso.enverus.com/auth
-SSO_ISSUER=unity-ai-production
-SSO_CALLBACK_URL=https://unity-ai.enverus.com/auth/callback
-SSO_CERT=<REAL_SSO_CERTIFICATE>
-
-# Frontend URL
 FRONTEND_URL=https://unity-ai.enverus.com
+API_URL=https://api.unity-ai.enverus.com
 
-# Session Secret
-SESSION_SECRET=<GENERATE_STRONG_256_BIT_KEY>
+SSO_ENTRY_POINT=https://sso.enverus.com/auth
+SSO_ISSUER=unity-ai
+SSO_CALLBACK_URL=https://api.unity-ai.enverus.com/auth/callback
+SSO_CERT=<FROM_ENVERUS>
+
+ERROR_TRACKING_DSN=<SENTRY_DSN>
 ```
 
-#### Frontend Production .env
-```bash
+### Frontend Configuration (`frontend/.env.production`)
+```env
 REACT_APP_API_URL=https://api.unity-ai.enverus.com
+REACT_APP_ENVIRONMENT=production
 ```
 
-### 2. Generate Secure Secrets
-
-Run these commands to generate production secrets:
+## 2. SSL/TLS (Let's Encrypt)
 
 ```bash
-# JWT Secret
-node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
+sudo apt-get install certbot python3-certbot-nginx
 
-# Session Secret
-node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
+sudo certbot certonly --nginx \
+  -d unity-ai.enverus.com \
+  -d api.unity-ai.enverus.com
 ```
 
-### 3. Database Setup (if needed in future)
-
-- Set up production database
-- Configure connection strings
-- Set up backups
-- Configure monitoring
-
-### 4. SSL/TLS Certificates
-
-- Obtain SSL certificates for HTTPS
-- Configure Nginx/Apache reverse proxy
-- Enable HTTPS redirect
-- Set up certificate auto-renewal
-
-### 5. Logging & Monitoring
-
-Install production logging:
+## 3. Process Manager (PM2)
 
 ```bash
+npm install -g pm2
 cd backend
-npm install winston morgan
+pm2 start src/index.js --name "unity-ai-api" --instances max
+pm2 save && pm2 startup
 ```
 
-### 6. Error Handling
+## 4. Web Server (Nginx)
 
-- Set up error tracking (Sentry, LogRocket, etc.)
-- Configure email alerts for critical errors
-- Set up uptime monitoring
+See DEPLOYMENT.md for complete Nginx configuration
 
-### 7. Performance Optimization
+## 5. Database (Future)
 
-- Enable gzip compression
-- Set up CDN for static assets
-- Configure caching headers
-- Minify and bundle frontend assets
+```bash
+# PostgreSQL
+CREATE DATABASE unity_ai_prod;
+CREATE USER unity_ai WITH PASSWORD '<PASSWORD>';
+GRANT ALL PRIVILEGES ON DATABASE unity_ai_prod TO unity_ai;
+```
 
-### 8. Security Checklist
+## 6. Monitoring & Backups
 
-- [ ] Replace mock SSO with real Enverus SSO
-- [ ] Generate strong JWT secrets
-- [ ] Enable HTTPS only
-- [ ] Set secure cookie flags
-- [ ] Configure CORS for production domain only
-- [ ] Enable rate limiting
-- [ ] Add security headers (helmet.js)
-- [ ] Set up CSP (Content Security Policy)
-- [ ] Enable SQL injection protection
-- [ ] Enable XSS protection
-- [ ] Configure proper session management
-- [ ] Set up regular security audits
+### Error Tracking
+```bash
+npm install @sentry/node
+```
 
-### 9. Testing Before Launch
+### Daily Backups
+```bash
+0 2 * * * pg_dump -U unity_ai unity_ai_prod | gzip > /backups/unity_ai_$(date +\%Y\%m\%d).sql.gz
+```
 
-- [ ] Load testing
-- [ ] Security penetration testing
-- [ ] Cross-browser testing
-- [ ] Mobile responsiveness testing
-- [ ] SSO integration testing with real Enverus accounts
-- [ ] User acceptance testing (UAT)
+## 7. Performance Targets
 
-### 10. Deployment
+- Frontend bundle: < 500KB gzip
+- API response: < 200ms (p95)
+- Database queries: < 100ms (p95)
+- Uptime: 99.9%
 
-- [ ] Set up CI/CD pipeline
-- [ ] Configure staging environment
-- [ ] Set up database migrations
-- [ ] Configure backup strategy
-- [ ] Set up rollback procedure
-- [ ] Document deployment process
+---
+
+**See DEPLOYMENT.md for deployment steps**

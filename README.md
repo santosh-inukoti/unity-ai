@@ -1,51 +1,39 @@
 # Unity AI
 
-Unity AI is Enverus' internal AI agentic solution built to drive revenue, increase retention, and make our teams more efficient.
+**Enverus' Internal AI Agentic Solution** - Driving revenue, increasing retention, and making teams more efficient.
 
 ## Overview
 
-This web application allows internal users to log in using their Enverus SSO credentials and access specialized AI agents based on their team assignment. The application features:
+Unity AI is a secure, team-aware AI agent platform for internal Enverus use. Features include:
 
-- **Enverus SSO Authentication**: Secure login using company email
-- **Team-Based Access Control**: Users are automatically assigned to teams (Sales, Marketing, Customer Success, etc.)
-- **Admin Permissions**: Admin users can view agents from all teams
-- **Single-Topic Agents**: Specialized AI agents for different business functions
-- **Modern Dark UI**: Enverus Unity design with responsive interface
+- **SSO Authentication**: Enverus SSO integration for secure access
+- **Team-Based Access Control**: Role-based agent access by team
+- **Admin Dashboard**: Manage users and view cross-team agents
+- **Specialized AI Agents**: Purpose-built agents for business functions
+- **Modern UI**: Dark theme with responsive design
 
-## Current Agents (Phase 1)
+## Phase 1 Agents
 
-### Available Agents
-
-1. **Net Promoter Score**
-   - Track and analyze customer satisfaction metrics
-   - Access: Sales, Marketing, Customer Success, Product & Engineering, Executive
-
-2. **Product Release Notes**
-   - Manage and communicate product updates
-   - Access: Sales, Marketing, Customer Success, Product & Engineering, Executive
-
-3. **Clari Calls**
-   - Analyze and transcribe sales calls
-   - Access: Sales, Customer Success, Product & Engineering, Executive
-
-4. **Third Party Stories**
-   - Collect and analyze customer success stories
-   - Access: Sales, Marketing, Customer Success, Product & Engineering, Executive
+| Agent | Purpose | Access |
+|-------|---------|--------|
+| **Net Promoter Score** | Customer satisfaction tracking & analysis | Sales, Marketing, CS, P&E, Exec |
+| **Product Release Notes** | Product updates & communications | Sales, Marketing, CS, P&E, Exec |
+| **Clari Calls** | Sales call analysis & transcription | Sales, CS, P&E, Exec |
+| **Third Party Stories** | Customer success story collection | Sales, Marketing, CS, P&E, Exec |
 
 ## Architecture
 
-### Backend (Node.js/Express)
-- RESTful API for authentication and agent management
-- JWT-based authentication
-- Team-based authorization
-- Mock SSO integration (ready for production Enverus SSO)
+### Backend
+- **Framework**: Node.js/Express
+- **Auth**: JWT tokens + SSO integration
+- **API**: RESTful endpoints with team-based access control
+- **Features**: Rate limiting, input validation, error logging
 
-### Frontend (React)
-- Modern React application with Context API
-- Responsive dark theme design
-- Protected routes with authentication
-- Team-based agent filtering
-- Admin dashboard for privileged users
+### Frontend
+- **Framework**: React 19 with Context API
+- **Routing**: React Router v7 with protected routes
+- **Styling**: CSS with dark theme
+- **Features**: Responsive design, team filtering, admin dashboard
 
 ## Getting Started
 

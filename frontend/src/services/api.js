@@ -19,25 +19,38 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+// Error handling
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
+
 // Auth services
 export const authService = {
   login: async (email, password) => {
-    try {
-      const response = await api.post('/auth/login', { email, password });
-      
-      if (response.data.token) {
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('user', JSON.stringify(response.data.user));
-      }
-      return response.data;
-    } catch (error) {
-      throw error;
+    const response = await api.post('/auth/login', { email, password });
+
+    if (response.data.token) {
+      localStorage.setItem('token', response.data.token);
+      localStorage.setItem('user', JSON.stringify(response.data.user));
+      localStorage.setItem('isAdmin', response.data.isAdmin);
+      localStorage.setItem('userTeam', response.data.team);
     }
+    return response.data;
   },
 
-  logout: () => {
+  logout: async () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    localStorage.removeItem('isAdmin');
+    localStorage.removeItem('userTeam');
     return api.post('/auth/logout');
   },
 

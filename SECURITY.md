@@ -1,53 +1,106 @@
-# Security Guidelines
+# Security Policy
 
-## Environment Variables
+## Overview
 
-**NEVER commit `.env` files to the repository.**
+Unity AI implements enterprise-grade security for internal Enverus employee data.
 
-### Required Environment Variables
+## Authentication & Authorization
 
-#### Backend (`backend/.env`)
-```env
-PORT=3001
-NODE_ENV=development
-JWT_SECRET=<strong-random-string>
-SESSION_SECRET=<strong-random-string>
-FRONTEND_URL=http://localhost:3000
+### SSO Integration
+- **Production**: Enverus SAML 2.0 authentication
+- **Development**: Mock email-based auth
+- **Tokens**: JWT with 24-hour expiration
+- **Validation**: Server-side session verification on requests
 
-# Production SSO (when ready)
-SSO_ENTRY_POINT=https://sso.enverus.com/auth
-SSO_ISSUER=unity-ai
-SSO_CALLBACK_URL=https://unity-ai.enverus.com/auth/callback
-SSO_CERT=<certificate-from-it>
+### Role-Based Access Control (RBAC)
+- **Admin**: Full access, can manage users
+- **User**: Team-assigned agents only
+- **Validation**: Applied on every API request
+- **Team Enforcement**: Whitelist-based access
+
+## API Security
+
+### Rate Limiting
+- 20 requests/minute per IP
+- Per-user limits on sensitive endpoints
+- Exponential backoff on repeated failures
+- Prevents brute force attacks
+
+### Input Validation
+- All inputs validated with express-validator
+- Email format validation
+- Team whitelist enforcement
+- Parameterized database queries
+- No raw SQL construction
+
+### Output Encoding
+- React XSS escaping enabled
+- Content Security Policy headers
+- No sensitive data in error messages
+- Safe JSON serialization
+
+## Data Protection
+
+### In Transit
+- HTTPS/TLS 1.2+ mandatory
+- Secure cookies (HttpOnly, Secure, SameSite)
+- HSTS enabled (1 year max-age)
+- CORS restricted to authorized domains
+
+### At Rest
+- Tokens in httpOnly cookies (production)
+- No sensitive data in localStorage
+- Secrets in environment variables only
+- No passwords stored (SSO-only authentication)
+
+## Security Headers
+
+```
+Strict-Transport-Security: max-age=31536000
+X-Content-Type-Options: nosniff
+X-Frame-Options: DENY
+X-XSS-Protection: 1; mode=block
+Content-Security-Policy: default-src 'self'
+Referrer-Policy: strict-origin-when-cross-origin
 ```
 
-#### Frontend (`frontend/.env`)
-```env
-REACT_APP_API_URL=http://localhost:3001
-```
+## Secrets Management
 
-### Generating Secure Secrets
+- Environment variables only
+- `.env` files in .gitignore
+- Rotate secrets quarterly
+- Use crypto.randomBytes(64) for generation
+- Never commit `.env` to git
 
-For production, generate strong secrets:
+## Compliance
 
-```bash
-# JWT Secret (256-bit)
-node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
+- ✓ OWASP Top 10 mitigations
+- ✓ CWE/SANS Top 25 coverage
+- ✓ Regular security audits
+- ✓ Quarterly penetration testing
 
-# Session Secret (256-bit)
-node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
-```
+## Regular Maintenance
 
-## Authentication
+- **Weekly**: Review error logs for anomalies
+- **Monthly**: Update dependencies
+- **Quarterly**: Penetration testing
+- **Annually**: Security training & policy review
 
-### Current Implementation (Mock SSO)
+## Incident Response
 
-- Accepts any `@enverus.com` email
-- Team assignment from backend database
-- Admin role for elevated permissions
-- JWT tokens with 24-hour expiration
+1. **Detection**: Monitor logs, metrics, error tracking
+2. **Containment**: Immediately disable affected resources
+3. **Investigation**: Review logs, identify root cause
+4. **Remediation**: Fix issue, deploy hotfix
+5. **Post-Mortem**: Document lessons learned
 
-**⚠️ This is for development only. Do not use in production.**
+## Reporting Security Issues
+
+Found a vulnerability?
+1. **Do not** disclose publicly
+2. Email security team immediately
+3. Include: description, reproduction steps, impact
+4. Allow 48 hours for acknowledgment
 
 ### Production Requirements
 

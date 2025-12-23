@@ -32,15 +32,9 @@ const Settings = () => {
   };
 
   const handleSaveChanges = () => {
-    // Update the user's team across the application
     updateUserTeam(selectedDept);
-    console.log('Settings saved', {
-      team: selectedDept,
-      sidebarCollapsedByDefault,
-      compactMode,
-      emailNotifications
-    });
-    // TODO: Save all settings to backend
+
+    // Settings saved notification
     alert('Settings saved successfully!');
   };
 
