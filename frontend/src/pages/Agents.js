@@ -15,23 +15,23 @@ const Agents = () => {
   const [groupName, setGroupName] = useState(location.state?.groupName || '');
 
   useEffect(() => {
+    const fetchAgents = async () => {
+      try {
+        // Decode the groupId and fetch agents
+        const decodedGroup = groupId.replace(/-/g, ' ').replace(/and/g, '&');
+        const response = await agentsService.getAgentsByGroup(decodedGroup);
+        setAgents(response.agents);
+        setGroupName(response.group);
+      } catch (err) {
+        setError('Failed to load agents. Please try again.');
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchAgents();
   }, [groupId]);
-
-  const fetchAgents = async () => {
-    try {
-      // Decode the groupId and fetch agents
-      const decodedGroup = groupId.replace(/-/g, ' ').replace(/and/g, '&');
-      const response = await agentsService.getAgentsByGroup(decodedGroup);
-      setAgents(response.agents);
-      setGroupName(response.group);
-    } catch (err) {
-      setError('Failed to load agents. Please try again.');
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleLogout = async () => {
     await logout();
