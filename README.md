@@ -4,28 +4,48 @@ Unity AI is Enverus' internal AI agentic solution built to drive revenue, increa
 
 ## Overview
 
-This web application allows internal users to log in using their Enverus SSO credentials and access specialized AI agents based on their department. The application features:
+This web application allows internal users to log in using their Enverus SSO credentials and access specialized AI agents based on their team assignment. The application features:
 
-- **Enverus SSO Authentication**: Secure login using company credentials
-- **Group-Based Access**: Users select their department to view relevant AI agents
-- **Multiple Departments**: Support for Sales, Marketing, Customer Success, Product & Engineering, Finance, Operations, and Executive teams
-- **AI Agent Integration**: Each agent has API endpoints that can be connected to for real-world usage
+- **Enverus SSO Authentication**: Secure login using company email
+- **Team-Based Access Control**: Users are automatically assigned to teams (Sales, Marketing, Customer Success, etc.)
+- **Admin Permissions**: Admin users can view agents from all teams
+- **Single-Topic Agents**: Specialized AI agents for different business functions
+- **Modern Dark UI**: Enverus Unity design with responsive interface
+
+## Current Agents (Phase 1)
+
+### Available Agents
+
+1. **Net Promoter Score**
+   - Track and analyze customer satisfaction metrics
+   - Access: Sales, Marketing, Customer Success, Product & Engineering, Executive
+
+2. **Product Release Notes**
+   - Manage and communicate product updates
+   - Access: Sales, Marketing, Customer Success, Product & Engineering, Executive
+
+3. **Clari Calls**
+   - Analyze and transcribe sales calls
+   - Access: Sales, Customer Success, Product & Engineering, Executive
+
+4. **Third Party Stories**
+   - Collect and analyze customer success stories
+   - Access: Sales, Marketing, Customer Success, Product & Engineering, Executive
 
 ## Architecture
-
-The application consists of two main components:
 
 ### Backend (Node.js/Express)
 - RESTful API for authentication and agent management
 - JWT-based authentication
-- Group-based authorization
+- Team-based authorization
 - Mock SSO integration (ready for production Enverus SSO)
 
 ### Frontend (React)
-- Modern React application with routing
-- Responsive design
+- Modern React application with Context API
+- Responsive dark theme design
 - Protected routes with authentication
-- Group selection and agent dashboard
+- Team-based agent filtering
+- Admin dashboard for privileged users
 
 ## Getting Started
 
@@ -48,25 +68,37 @@ npm run install-all
 
 3. **Set up environment variables (IMPORTANT):**
 
-**Backend:**
+**Backend** - Create `.env` file:
 ```bash
 cd backend
 cp .env.example .env
-# Edit .env and replace placeholder values with actual secrets
 ```
 
-**Frontend:**
+Edit `backend/.env` with:
+```env
+PORT=3001
+NODE_ENV=development
+JWT_SECRET=unity-ai-secret-key-change-in-production
+FRONTEND_URL=http://localhost:3000
+SESSION_SECRET=unity-ai-session-secret-change-in-production
+```
+
+**Frontend** - Create `.env` file:
 ```bash
 cd frontend
 cp .env.example .env
-# Edit .env if you need to change the API URL
+```
+
+Edit `frontend/.env` with:
+```env
+REACT_APP_API_URL=http://localhost:3001
 ```
 
 **⚠️ NEVER commit `.env` files to git!**
 
 ### Running the Application
 
-#### Development Mode
+#### Quick Start
 
 Run both frontend and backend simultaneously:
 ```bash
@@ -77,21 +109,14 @@ This will start:
 - Backend API on http://localhost:3001
 - Frontend application on http://localhost:3000
 
-#### Production Mode
+#### Using the Start Script
 
-1. Build the frontend:
+Windows users can use the batch file:
 ```bash
-npm run build
+start.bat
 ```
 
-2. Start the backend:
-```bash
-npm start
-```
-
-### Manual Start
-
-You can also run frontend and backend separately:
+#### Manual Start
 
 **Backend:**
 ```bash
@@ -107,68 +132,132 @@ npm start       # Development server
 npm run build   # Production build
 ```
 
+### Troubleshooting
+
+**Port already in use:**
+```bash
+# Kill processes on ports 3000 and 3001
+kill-ports.bat
+```
+
+Or manually:
+```bash
+# Find process on port
+netstat -ano | findstr :3001
+# Kill process (replace PID with actual process ID)
+taskkill /PID <PID> /F
+```
+
 ## Usage
 
-1. **Login**: Navigate to http://localhost:3000 and log in with any valid email address (mock authentication)
-   - Example: `user@enverus.com` with any password
+### Login
 
-2. **Select Group**: Choose your department from the available groups:
-   - Sales
-   - Marketing
-   - Customer Success
-   - Product & Engineering
-   - Finance
-   - Operations
-   - Executive
+1. Navigate to http://localhost:3000
+2. Enter your Enverus email address
+3. Click "Sign in with SSO"
 
-3. **Access Agents**: View and connect to AI agents available for your department
+**Mock Users for Testing:**
+- `santosh.inukoti@enverus.com` - Admin (can see all teams)
+- `john.doe@enverus.com` - Sales team
+- `jane.smith@enverus.com` - Customer Success team
+- Any `@enverus.com` email - Defaults to Sales team
 
-## Available AI Agents
+### Dashboard
 
-### Sales
-- Lead Qualifier
-- Deal Analyzer
-- Pipeline Manager
+After login, you'll see:
+- **At a Glance**: Metrics showing total agents, active chats, sessions
+- **Quick Start**: Actions to browse agents or create workspaces
+- **Single-Topic Agents**: Available agents for your team
 
-### Marketing
-- Campaign Optimizer
-- Content Generator
-- Audience Insights
+### Agents Page
 
-### Customer Success
-- Churn Predictor
-- Health Score Monitor
-- Support Assistant
+Browse all agents available to your team:
+- Filter by Single or Multi-Agent
+- Search agents by name or description
+- View team access permissions
+- Start conversations with agents
 
-### Product & Engineering
-- Code Reviewer
-- Bug Analyzer
-- Feature Prioritizer
+### Settings
 
-### Finance
-- Forecast Analyzer
-- Expense Optimizer
-- Risk Assessor
+Configure your preferences:
+- View your profile and team assignment
+- **Admin Only**: Switch between teams to view different agents
+- Adjust display settings
+- Manage notifications
 
-### Operations
-- Process Optimizer
-- Resource Allocator
-- Workflow Analyzer
+## Team Access Control
 
-### Executive (All executives have access to all agents plus)
-- Strategic Advisor
-- Performance Dashboard
+### How It Works
+
+- Users are assigned a team during authentication
+- Each agent has specific team access permissions
+- Users only see agents available to their team
+- Admin users can view agents from all teams
+
+### Teams
+
+- Sales
+- Marketing
+- Customer Success
+- Product & Engineering
+- HR
+- Finance
+- Operations
+- Executive
+
+### Adding Team Assignments
+
+Update the `mockUsers` object in `backend/src/routes/auth.js`:
+
+```javascript
+const mockUsers = {
+  'user@enverus.com': {
+    team: 'Sales',
+    isAdmin: false,
+    name: 'User Name'
+  }
+};
+```
+
+## Adding New Agents
+
+To add a new agent, update `backend/src/config/agents.js`:
+
+```javascript
+{
+  id: 'unique-agent-id',
+  name: 'Agent Name',
+  description: 'What the agent does',
+  groups: ['Sales', 'Marketing'], // Teams with access
+  apiEndpoint: 'https://api.unity-ai.enverus.com/agents/endpoint',
+  category: 'Category Name',
+  isMultiAgent: false // true for multi-agent systems
+}
+```
+
+The agent will automatically appear for users in the specified teams.
 
 ## API Documentation
 
 ### Authentication Endpoints
 
 #### POST `/auth/login`
-Login with credentials
+Login with email (mock SSO)
 ```json
 {
   "email": "user@enverus.com",
-  "password": "password"
+  "password": "mock-password"
+}
+```
+
+Response:
+```json
+{
+  "success": true,
+  "token": "jwt-token",
+  "user": { "id": "123", "email": "user@enverus.com", "name": "User" },
+  "team": "Sales",
+  "isAdmin": false
 }
 ```
 
@@ -181,10 +270,10 @@ Verify authentication token
 ### Agent Endpoints
 
 #### GET `/api/groups`
-Get all available groups
+Get all available teams
 
 #### GET `/api/agents/:group`
-Get agents for a specific group
+Get agents for a specific team
 
 #### GET `/api/agents`
 Get all agents
@@ -192,48 +281,120 @@ Get all agents
 #### GET `/api/agent/:id`
 Get specific agent details
 
-## Configuration
-
-### Backend Environment Variables
-- `PORT`: Backend server port (default: 3001)
-- `JWT_SECRET`: Secret key for JWT tokens
-- `FRONTEND_URL`: Frontend application URL
-- `SSO_*`: SSO configuration for production
-
-### Frontend Environment Variables
-- `REACT_APP_API_URL`: Backend API URL (default: http://localhost:3001)
-
 ## Security
 
-- JWT-based authentication
-- Protected routes
-- Token verification
-- Ready for production SSO integration (SAML/OAuth2)
+### Current Implementation
+- JWT-based authentication with 24-hour expiration
+- Team-based authorization
+- Protected API routes
+- Admin role for elevated permissions
+- Mock SSO (ready for production integration)
 
-## Production Deployment
+### Production Requirements
+- Replace mock SSO with real Enverus SSO (SAML/OAuth2)
+- Generate strong JWT secrets (256-bit minimum)
+- Enable HTTPS only
+- Configure production CORS
+- Add rate limiting
+- Implement proper session management
 
-For production deployment with real Enverus SSO:
+See `PRODUCTION-SETUP.md` for complete production checklist.
 
-1. Configure SSO settings in backend `.env`:
-   - Set `SSO_ENTRY_POINT` to your SSO provider URL
-   - Set `SSO_ISSUER` and `SSO_CALLBACK_URL`
-   - Add your SSO certificate
+## Project Structure
 
-2. Update authentication flow to use SAML/OAuth2 instead of mock login
+```
+unity-ai/
+├── backend/
+│   ├── src/
+│   │   ├── config/
+│   │   │   └── agents.js          # Agent definitions
+│   │   ├── middleware/
+│   │   │   └── auth.js             # JWT verification
+│   │   ├── routes/
+│   │   │   ├── auth.js             # Authentication routes
+│   │   │   └── agents.js           # Agent routes
+│   │   └── index.js                # Express server
+│   ├── .env.example
+│   └── package.json
+├── frontend/
+│   ├── public/
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── Sidebar.js          # Navigation sidebar
+│   │   │   ├── TopHeader.js        # Header with search & user menu
+│   │   │   └── ProtectedRoute.js   # Route protection
+│   │   ├── context/
+│   │   │   └── AuthContext.js      # Authentication state
+│   │   ├── pages/
+│   │   │   ├── Login.js            # Login page
+│   │   │   ├── Dashboard.js        # Home dashboard
+│   │   │   ├── Agents.js           # Agents listing
+│   │   │   ├── Settings.js         # User settings
+│   │   │   ├── Workspaces.js       # Workspaces (Phase 2)
+│   │   │   └── Reports.js          # Reports (Phase 2)
+│   │   ├── services/
+│   │   │   └── api.js              # API client
+│   │   ├── App.js
+│   │   └── index.js
+│   ├── .env.example
+│   └── package.json
+├── .gitignore
+├── package.json
+├── start.bat                       # Windows startup script
+├── kill-ports.bat                  # Port cleanup script
+└── README.md
+```
 
-3. Build frontend for production:
-   ```bash
-   cd frontend
-   npm run build
-   ```
+## Development Roadmap
 
-4. Deploy backend with environment variables configured
+### Phase 1 (Current) ✅
+- ✅ SSO-based authentication
+- ✅ Team-based access control
+- ✅ Admin permissions
+- ✅ 4 single-topic agents
+- ✅ Dashboard and agents pages
+- ✅ Settings page
+- ✅ Dark theme UI
+
+### Phase 2 (Planned)
+- [ ] Real Enverus SSO integration
+- [ ] Workspaces for active conversations
+- [ ] Reports and analytics
+- [ ] Multi-agent systems
+- [ ] Agent conversation interface
+- [ ] Real-time notifications
+
+### Phase 3 (Future)
+- [ ] Database integration
+- [ ] Chat history persistence
+- [ ] Agent performance metrics
+- [ ] Team collaboration features
+- [ ] Mobile application
 
 ## Contributing
 
-This is an internal Enverus project. For contributions, please follow the internal development guidelines.
+This is an internal Enverus project. For contributions:
+
+1. Create a feature branch
+2. Make your changes
+3. Test thoroughly
+4. Submit a pull request
+5. Get approval from project maintainers
+
+## Support
+
+For issues or questions:
+- Technical issues: Contact IT Support
+- Feature requests: Contact Product Team
+- Security concerns: Contact security@enverus.com
 
 ## License
 
 UNLICENSED - Internal Enverus Use Only
+
+---
+
+**Version:** 1.0.0 (Phase 1)  
+**Last Updated:** January 2025  
+**Maintained by:** Enverus Product Team
 
