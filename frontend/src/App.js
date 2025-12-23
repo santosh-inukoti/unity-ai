@@ -4,7 +4,6 @@ import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
-import Groups from './pages/Groups';
 import Agents from './pages/Agents';
 import Workspaces from './pages/Workspaces';
 import Reports from './pages/Reports';
@@ -22,14 +21,6 @@ function App() {
             element={
               <ProtectedRoute>
                 <Dashboard />
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="/groups" 
-            element={
-              <ProtectedRoute>
-                <Groups />
               </ProtectedRoute>
             } 
           />
