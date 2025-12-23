@@ -6,7 +6,7 @@ const agents = [
     name: 'Net Promoter Score',
     description: 'Track and analyze customer satisfaction metrics',
     groups: ['Sales', 'Marketing', 'Customer Success', 'Product & Engineering', 'Executive'],
-    apiEndpoint: 'https://api.unity-ai.enverus.com/agents/nps',
+    apiEndpoint: 'https://api.unity-ai.enverus.com/agents/nps', // TODO: Replace with real endpoint
     category: 'Analytics',
     isMultiAgent: false
   },

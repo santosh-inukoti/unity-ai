@@ -7,12 +7,22 @@ const router = express.Router();
 router.post('/login', (req, res) => {
   const { email, password } = req.body;
   
-  // Mock authentication - In production, validate against Enverus SSO
+  // TODO: Replace mock authentication with real Enverus SSO
+  // router.post('/login', (req, res) => {
+  //   const { email, password } = req.body;
+  
+  // ⚠️ REMOVE THIS MOCK AUTHENTICATION IN PRODUCTION
+  // TODO: Integrate with Enverus SSO (SAML/OAuth2)
+  // Example:
+  // const ssoResponse = await enverusSSOService.authenticate(email, password);
+  // const user = ssoResponse.user;
+  // const team = ssoResponse.team;
+  
   if (!email || !password) {
     return res.status(400).json({ error: 'Email and password required' });
   }
   
-  // Mock user data - In production, this would come from SSO
+  // Mock user data - REPLACE WITH REAL SSO DATA
   const user = {
     id: Date.now().toString(),
     email,
@@ -20,7 +30,6 @@ router.post('/login', (req, res) => {
     company: 'Enverus'
   };
   
-  // Generate JWT token
   const token = jwt.sign(user, process.env.JWT_SECRET, { expiresIn: '24h' });
   
   res.json({
