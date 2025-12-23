@@ -7,20 +7,8 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [selectedTeam, setSelectedTeam] = useState('Sales');
   const { login } = useAuth();
   const navigate = useNavigate();
-
-  const teams = [
-    { name: 'Sales', icon: '📈' },
-    { name: 'Marketing', icon: '📢' },
-    { name: 'Customer Success', icon: '❤️' },
-    { name: 'Product & Engineering', icon: '💻' },
-    { name: 'HR', icon: '👥' },
-    { name: 'Finance', icon: '💵' },
-    { name: 'Operations', icon: '🔧' },
-    { name: 'Executive', icon: '👑' },
-  ];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -28,11 +16,12 @@ const Login = () => {
     setLoading(true);
 
     try {
-      // SSO only requires email, team is passed during login
-      await login(email, 'sso-auth', selectedTeam);
+      // Pass email and a dummy password for mock SSO
+      await login(email, 'mock-password');
       navigate('/dashboard');
     } catch (err) {
-      setError(err.response?.data?.error || 'Login failed. Please try again.');
+      const errorMessage = err.response?.data?.error || err.message || 'Login failed. Please try again.';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -59,24 +48,6 @@ const Login = () => {
               required
               disabled={loading}
             />
-          </div>
-
-          <div className="form-group">
-            <label>Select Your Team</label>
-            <div className="team-selector-grid">
-              {teams.map((team) => (
-                <button
-                  key={team.name}
-                  type="button"
-                  className={`team-selector-btn ${selectedTeam === team.name ? 'active' : ''}`}
-                  onClick={() => setSelectedTeam(team.name)}
-                  disabled={loading}
-                >
-                  <span className="team-icon">{team.icon}</span>
-                  <span className="team-label">{team.name}</span>
-                </button>
-              ))}
-            </div>
           </div>
 
           {error && <div className="error-message">{error}</div>}

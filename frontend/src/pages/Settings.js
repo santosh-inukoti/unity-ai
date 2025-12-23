@@ -5,7 +5,7 @@ import TopHeader from '../components/TopHeader';
 import './Settings.css';
 
 const Settings = () => {
-  const { user, userTeam, updateUserTeam } = useAuth();
+  const { user, userTeam, isAdmin, updateUserTeam } = useAuth();
   const [selectedDept, setSelectedDept] = useState(userTeam || 'Sales');
   const [sidebarCollapsedByDefault, setSidebarCollapsedByDefault] = useState(false);
   const [compactMode, setCompactMode] = useState(false);
@@ -70,33 +70,37 @@ const Settings = () => {
                 <div className="profile-name">{user?.name || user?.email?.split('@')[0] || 'User'}</div>
                 <div className="profile-email">{user?.email}</div>
                 <div className="profile-badges">
-                  <span className="badge role-badge">Customer Success</span>
-                  <span className="badge admin-badge">Admin</span>
+                  <span className="badge role-badge">{userTeam}</span>
+                  {isAdmin && <span className="badge admin-badge">Admin</span>}
                 </div>
               </div>
             </div>
           </section>
 
-          {/* Default Team Section */}
-          <section className="settings-section">
-            <div className="section-header">
-              <span className="section-icon">🤝</span>
-              <h2>Default Team</h2>
-            </div>
-            <div className="team-grid">
-              {departments.map((dept) => (
-                <button
-                  key={dept.name}
-                  className={`team-card ${selectedDept === dept.name ? 'active' : ''}`}
-                  onClick={() => handleTeamSelect(dept.name)}
-                >
-                  <div className="team-icon">{dept.icon}</div>
-                  <div className="team-name">{dept.name}</div>
-                  {selectedDept === dept.name && <div className="team-checkmark">✓</div>}
-                </button>
-              ))}
-            </div>
-          </section>
+          {/* Default Team Section - Only show for admin users */}
+          {isAdmin && (
+            <section className="settings-section">
+              <div className="section-header">
+                <span className="section-icon">🤝</span>
+                <h2>Default Team</h2>
+                <span className="admin-only-badge">Admin Only</span>
+              </div>
+              <p className="section-description">As an admin, you can view agents from any team.</p>
+              <div className="team-grid">
+                {departments.map((dept) => (
+                  <button
+                    key={dept.name}
+                    className={`team-card ${selectedDept === dept.name ? 'active' : ''}`}
+                    onClick={() => handleTeamSelect(dept.name)}
+                  >
+                    <div className="team-icon">{dept.icon}</div>
+                    <div className="team-name">{dept.name}</div>
+                    {selectedDept === dept.name && <div className="team-checkmark">✓</div>}
+                  </button>
+                ))}
+              </div>
+            </section>
+          )}
 
           {/* Display Section */}
           <section className="settings-section">

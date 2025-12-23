@@ -2,46 +2,63 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const router = express.Router();
 
-// Mock SSO login endpoint
-// In production, this would integrate with Enverus SSO (SAML/OAuth2)
+// Mock user database with team assignments
+// TODO: Replace with real database and SSO integration
+const mockUsers = {
+  'santosh.inukoti@enverus.com': {
+    team: 'Sales',
+    isAdmin: true,
+    name: 'Santosh Inukoti'
+  },
+  'john.doe@enverus.com': {
+    team: 'Sales',
+    isAdmin: false,
+    name: 'John Doe'
+  },
+  'jane.smith@enverus.com': {
+    team: 'Customer Success',
+    isAdmin: false,
+    name: 'Jane Smith'
+  }
+};
+
+// Mock SSO login endpoint - accepts ANY email for testing
 router.post('/login', (req, res) => {
-  const { email, password } = req.body;
+  const { email } = req.body;
   
-  // TODO: Replace mock authentication with real Enverus SSO
-  // router.post('/login', (req, res) => {
-  //   const { email, password } = req.body;
-  
-  // ⚠️ REMOVE THIS MOCK AUTHENTICATION IN PRODUCTION
-  // TODO: Integrate with Enverus SSO (SAML/OAuth2)
-  // Example:
-  // const ssoResponse = await enverusSSOService.authenticate(email, password);
-  // const user = ssoResponse.user;
-  // const team = ssoResponse.team;
-  
-  if (!email || !password) {
-    return res.status(400).json({ error: 'Email and password required' });
+  if (!email) {
+    return res.status(400).json({ error: 'Email is required' });
   }
   
-  // Mock user data - REPLACE WITH REAL SSO DATA
+  // Get user info from mock database or use defaults
+  const userInfo = mockUsers[email.toLowerCase()] || {
+    team: 'Sales',
+    isAdmin: false,
+    name: email.split('@')[0].replace('.', ' ').replace(/\b\w/g, l => l.toUpperCase())
+  };
+  
+  // Mock user data
   const user = {
     id: Date.now().toString(),
     email,
-    name: email.split('@')[0],
+    name: userInfo.name,
     company: 'Enverus'
   };
   
+  // Generate JWT token
   const token = jwt.sign(user, process.env.JWT_SECRET, { expiresIn: '24h' });
   
   res.json({
     success: true,
     token,
-    user
+    user,
+    team: userInfo.team,
+    isAdmin: userInfo.isAdmin
   });
 });
 
 // Mock SSO callback endpoint
 router.get('/callback', (req, res) => {
-  // In production, this would handle SAML/OAuth2 callback
   res.redirect(`${process.env.FRONTEND_URL}/dashboard`);
 });
 

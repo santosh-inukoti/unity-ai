@@ -14,6 +14,7 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [userTeam, setUserTeam] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
@@ -22,6 +23,7 @@ export const AuthProvider = ({ children }) => {
     const checkAuth = async () => {
       const storedUser = authService.getUser();
       const storedTeam = localStorage.getItem('userTeam');
+      const storedIsAdmin = localStorage.getItem('isAdmin') === 'true';
       const hasToken = authService.isAuthenticated();
       
       if (storedUser && hasToken) {
@@ -29,13 +31,16 @@ export const AuthProvider = ({ children }) => {
           await authService.verify();
           setUser(storedUser);
           setUserTeam(storedTeam || 'Sales');
+          setIsAdmin(storedIsAdmin);
           setIsAuthenticated(true);
         } catch (error) {
           // Token is invalid, clear storage
           authService.logout();
           localStorage.removeItem('userTeam');
+          localStorage.removeItem('isAdmin');
           setUser(null);
           setUserTeam(null);
+          setIsAdmin(false);
           setIsAuthenticated(false);
         }
       }
@@ -45,15 +50,25 @@ export const AuthProvider = ({ children }) => {
     checkAuth();
   }, []);
 
-  const login = async (email, password, team = 'Sales') => {
+  const login = async (email, password) => {
     try {
       const response = await authService.login(email, password);
+      
+      // Team and admin status come from backend
+      const team = response.team || 'Sales';
+      const adminStatus = response.isAdmin || false;
+      
       setUser(response.user);
       setUserTeam(team);
+      setIsAdmin(adminStatus);
       setIsAuthenticated(true);
+      
       localStorage.setItem('userTeam', team);
+      localStorage.setItem('isAdmin', adminStatus.toString());
+      
       return response;
     } catch (error) {
+      console.error('Login error:', error);
       throw error;
     }
   };
@@ -63,8 +78,10 @@ export const AuthProvider = ({ children }) => {
       await authService.logout();
       setUser(null);
       setUserTeam(null);
+      setIsAdmin(false);
       setIsAuthenticated(false);
       localStorage.removeItem('userTeam');
+      localStorage.removeItem('isAdmin');
     } catch (error) {
       console.error('Logout error:', error);
     }
@@ -78,6 +95,7 @@ export const AuthProvider = ({ children }) => {
   const value = {
     user,
     userTeam,
+    isAdmin,
     isAuthenticated,
     loading,
     login,
