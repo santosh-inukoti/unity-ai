@@ -28,7 +28,9 @@ const Groups = () => {
   };
 
   const handleGroupClick = (group) => {
-    navigate(`/agents/${group.id}`, { state: { groupName: group.name } });
+    if (group && group.id) {
+      navigate(`/agents/${group.id}`, { state: { groupName: group.name } });
+    }
   };
 
   const handleLogout = async () => {

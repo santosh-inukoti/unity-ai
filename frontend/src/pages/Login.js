@@ -5,11 +5,22 @@ import './Login.css';
 
 const Login = () => {
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [selectedTeam, setSelectedTeam] = useState('Sales');
   const { login } = useAuth();
   const navigate = useNavigate();
+
+  const teams = [
+    { name: 'Sales', icon: '📈' },
+    { name: 'Marketing', icon: '📢' },
+    { name: 'Customer Success', icon: '❤️' },
+    { name: 'Product & Engineering', icon: '💻' },
+    { name: 'HR', icon: '👥' },
+    { name: 'Finance', icon: '💵' },
+    { name: 'Operations', icon: '🔧' },
+    { name: 'Executive', icon: '👑' },
+  ];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -17,8 +28,9 @@ const Login = () => {
     setLoading(true);
 
     try {
-      await login(email, password);
-      navigate('/groups');
+      // SSO only requires email, team is passed during login
+      await login(email, 'sso-auth', selectedTeam);
+      navigate('/dashboard');
     } catch (err) {
       setError(err.response?.data?.error || 'Login failed. Please try again.');
     } finally {
@@ -30,6 +42,7 @@ const Login = () => {
     <div className="login-container">
       <div className="login-box">
         <div className="login-header">
+          <div className="logo-icon">E</div>
           <h1>Unity AI</h1>
           <p>Enverus Internal AI Platform</p>
         </div>
@@ -49,22 +62,27 @@ const Login = () => {
           </div>
 
           <div className="form-group">
-            <label htmlFor="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter your password"
-              required
-              disabled={loading}
-            />
+            <label>Select Your Team</label>
+            <div className="team-selector-grid">
+              {teams.map((team) => (
+                <button
+                  key={team.name}
+                  type="button"
+                  className={`team-selector-btn ${selectedTeam === team.name ? 'active' : ''}`}
+                  onClick={() => setSelectedTeam(team.name)}
+                  disabled={loading}
+                >
+                  <span className="team-icon">{team.icon}</span>
+                  <span className="team-label">{team.name}</span>
+                </button>
+              ))}
+            </div>
           </div>
 
           {error && <div className="error-message">{error}</div>}
 
           <button type="submit" className="login-button" disabled={loading}>
-            {loading ? 'Signing in...' : 'Sign in with Enverus SSO'}
+            {loading ? 'Signing in...' : 'Sign in with SSO'}
           </button>
         </form>
 

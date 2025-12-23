@@ -3,33 +3,46 @@
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #0a0e1a;
   padding: 20px;
 }
 
 .login-box {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-  padding: 40px;
+  background: #111827;
+  border: 1px solid #1f2937;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  padding: 48px;
   max-width: 450px;
   width: 100%;
 }
 
 .login-header {
   text-align: center;
-  margin-bottom: 30px;
+  margin-bottom: 40px;
+}
+
+.logo-icon {
+  width: 64px;
+  height: 64px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  margin: 0 auto 20px;
 }
 
 .login-header h1 {
-  color: #333;
+  color: #ffffff;
   font-size: 32px;
   margin: 0 0 10px 0;
   font-weight: 700;
 }
 
 .login-header p {
-  color: #666;
+  color: #9ca3af;
   font-size: 16px;
   margin: 0;
 }
@@ -37,51 +50,60 @@
 .login-form {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 24px;
 }
 
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 
 .form-group label {
-  color: #333;
+  color: #e5e7eb;
   font-weight: 600;
   font-size: 14px;
 }
 
 .form-group input {
-  padding: 12px 16px;
-  border: 2px solid #e0e0e0;
+  padding: 14px 16px;
+  background: #1f2937;
+  border: 1px solid #374151;
   border-radius: 8px;
-  font-size: 14px;
+  font-size: 15px;
+  color: #ffffff;
   transition: all 0.3s;
+}
+
+.form-group input::placeholder {
+  color: #6b7280;
 }
 
 .form-group input:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: #10b981;
+  background: #1f2937;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
 }
 
 .form-group input:disabled {
-  background-color: #f5f5f5;
+  background-color: #111827;
   cursor: not-allowed;
+  opacity: 0.5;
 }
 
 .error-message {
-  background-color: #fee;
-  color: #c33;
-  padding: 12px;
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #f87171;
+  padding: 12px 16px;
   border-radius: 8px;
   font-size: 14px;
   text-align: center;
+  border: 1px solid rgba(239, 68, 68, 0.2);
 }
 
 .login-button {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   color: white;
   border: none;
   padding: 14px;
@@ -90,12 +112,16 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s;
-  margin-top: 10px;
+  margin-top: 8px;
 }
 
 .login-button:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+}
+
+.login-button:active:not(:disabled) {
+  transform: translateY(0);
 }
 
 .login-button:disabled {
@@ -105,12 +131,76 @@
 }
 
 .login-info {
-  margin-top: 24px;
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid #1f2937;
   text-align: center;
 }
 
 .login-info p {
-  color: #666;
+  color: #6b7280;
   font-size: 13px;
   margin: 0;
+}
+
+.team-selector-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.team-selector-btn {
+  background: #1f2937;
+  border: 1px solid #374151;
+  border-radius: 8px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: #9ca3af;
+  font-size: 12px;
+  font-weight: 500;
+  disabled: false;
+}
+
+.team-selector-btn:hover:not(:disabled) {
+  border-color: #10b981;
+  background: #111827;
+}
+
+.team-selector-btn.active {
+  background: rgba(16, 185, 129, 0.1);
+  border-color: #10b981;
+  color: #10b981;
+  font-weight: 600;
+}
+
+.team-selector-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.team-icon {
+  font-size: 24px;
+}
+
+.team-label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 480px) {
+  .login-box {
+    padding: 32px 24px;
+  }
+  
+  .login-header h1 {
+    font-size: 28px;
+  }
 }

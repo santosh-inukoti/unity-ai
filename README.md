@@ -46,21 +46,23 @@ cd unity-ai
 npm run install-all
 ```
 
-This will install dependencies for both backend and frontend.
+3. **Set up environment variables (IMPORTANT):**
 
-3. Set up environment variables:
-
-**Backend** - Copy `.env.example` to `.env`:
+**Backend:**
 ```bash
 cd backend
 cp .env.example .env
+# Edit .env and replace placeholder values with actual secrets
 ```
 
-**Frontend** - Copy `.env.example` to `.env`:
+**Frontend:**
 ```bash
 cd frontend
 cp .env.example .env
+# Edit .env if you need to change the API URL
 ```
+
+**⚠️ NEVER commit `.env` files to git!**
 
 ### Running the Application
 
