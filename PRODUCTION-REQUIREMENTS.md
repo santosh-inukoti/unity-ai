@@ -52,7 +52,6 @@
 - [ ] SSO tested with real accounts
 - [ ] All teams can access their agents
 - [ ] Settings persist correctly
-- [ ] Mobile/tablet responsive
 - [ ] Browser compatibility verified
 
 ## Phase 4 - Documentation
